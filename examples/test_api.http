@@ -1,0 +1,109 @@
+# 高级功能 API 测试命令（Windows CMD）
+
+## 1. OR 条件查询
+curl -X POST http://localhost:8080/users/query-or -H "Content-Type: application/json" -d "{\"filters\":{\"or\":[{\"age\":30},{\"name\":\"admin\"}]}}"
+
+# 说明：查询年龄>=30 或 名字包含"admin"的用户
+
+---
+
+## 2. 统计查询
+curl -X POST http://localhost:8080/users/stats -H "Content-Type: application/json" -d "{\"filters\":{\"age\":18}}"
+
+# 说明：统计年龄>=18的用户，返回总数、总和、平均值、最小值、最大值
+
+---
+
+## 3. 批量创建
+curl -X POST http://localhost:8080/users/batch -H "Content-Type: application/json" -d "[{\"name\":\"用户1\",\"age\":20},{\"name\":\"用户2\",\"age\":25},{\"name\":\"用户3\",\"age\":30}]"
+
+# 说明：一次创建多个用户，自动生成ID
+
+---
+
+## 4. 批量更新（不同ID不同值）
+curl -X POST http://localhost:8080/users/batch-update -H "Content-Type: application/json" -d "[{\"id\":\"替换为实际ID1\",\"updates\":{\"name\":\"张三\",\"age\":25}},{\"id\":\"替换为实际ID2\",\"updates\":{\"age\":30}}]"
+
+# 说明：批量更新不同用户的不同字段
+
+---
+
+## 5. 批量删除
+curl -X POST http://localhost:8080/users/batch-delete -H "Content-Type: application/json" -d "{\"ids\":[\"替换为实际ID1\",\"替换为实际ID2\",\"替换为实际ID3\"]}"
+
+# 说明：一次删除多个用户
+
+---
+
+## 6. 范围查询（使用基础query接口）
+curl -X POST http://localhost:8080/users/query -H "Content-Type: application/json" -d "{\"filters\":{\"age\":{\"min\":18,\"max\":60}}}"
+
+# 说明：查询年龄在18-60之间的用户
+
+---
+
+## 7. 创建单个用户（通用Handler）
+curl -X POST http://localhost:8080/users -H "Content-Type: application/json" -d "{\"name\":\"测试用户\",\"age\":25}"
+
+# 说明：使用通用Handler创建，自动生成ID
+
+---
+
+## 8. 创建单个用户（原生实现对比）
+curl -X POST http://localhost:8080/users/native -H "Content-Type: application/json" -d "{\"name\":\"测试用户\",\"age\":25}"
+
+# 说明：原生GORM实现，功能相同但代码更多
+
+---
+
+## 9. 查询列表（支持分页、过滤、排序）
+curl -X POST http://localhost:8080/users/query -H "Content-Type: application/json" -d "{\"page\":{\"page_num\":1,\"page_size\":10},\"filters\":{\"age\":18},\"orders\":{\"age\":\"desc\"}}"
+
+# 说明：查询年龄>=18的用户，按年龄降序，分页显示
+
+---
+
+## 10. 更新用户
+curl -X POST http://localhost:8080/users/update -H "Content-Type: application/json" -d "{\"filters\":{\"id\":\"替换为实际ID\"},\"updates\":{\"name\":\"新名字\",\"age\":30}}"
+
+# 说明：根据ID更新用户信息
+
+---
+
+## 11. 删除用户
+curl -X POST http://localhost:8080/users/delete -H "Content-Type: application/json" -d "{\"filters\":{\"id\":\"替换为实际ID\"}}"
+
+# 说明：根据ID删除用户
+
+---
+
+## 完整测试流程：
+
+# 步骤1: 批量创建5个测试用户
+curl -X POST http://localhost:8080/users/batch -H "Content-Type: application/json" -d "[{\"name\":\"张三\",\"age\":25},{\"name\":\"李四\",\"age\":30},{\"name\":\"王五\",\"age\":35},{\"name\":\"admin\",\"age\":28},{\"name\":\"赵六\",\"age\":22}]"
+
+# 步骤2: 查询所有用户（记录返回的ID）
+curl -X POST http://localhost:8080/users/query -H "Content-Type: application/json" -d "{\"page\":{\"page_num\":1,\"page_size\":100}}"
+
+# 步骤3: OR条件查询（年龄>=30 或 名字包含admin）
+curl -X POST http://localhost:8080/users/query-or -H "Content-Type: application/json" -d "{\"filters\":{\"or\":[{\"age\":30},{\"name\":\"admin\"}]}}"
+
+# 步骤4: 统计查询（年龄>=20的用户统计）
+curl -X POST http://localhost:8080/users/stats -H "Content-Type: application/json" -d "{\"filters\":{\"age\":20}}"
+
+# 步骤5: 范围查询（年龄在25-35之间）
+curl -X POST http://localhost:8080/users/query -H "Content-Type: application/json" -d "{\"filters\":{\"age\":{\"min\":25,\"max\":35}}}"
+
+# 步骤6: 批量更新（使用步骤2获取的ID）
+curl -X POST http://localhost:8080/users/batch-update -H "Content-Type: application/json" -d "[{\"id\":\"从步骤2获取的ID1\",\"updates\":{\"age\":26}},{\"id\":\"从步骤2获取的ID2\",\"updates\":{\"name\":\"李四改名\"}}]"
+
+# 步骤7: 批量删除（使用步骤2获取的ID）
+curl -X POST http://localhost:8080/users/batch-delete -H "Content-Type: application/json" -d "{\"ids\":[\"从步骤2获取的ID1\",\"从步骤2获取的ID2\"]}"
+
+---
+
+## 注意事项：
+# 1. Windows CMD 中 JSON 需要转义双引号（使用 \"）
+# 2. 如果使用 PowerShell，可以使用单引号包裹 JSON，无需转义
+# 3. 批量更新和批量删除需要先通过查询接口获取实际的用户ID
+# 4. 所有接口都返回统一格式：{"code": 200, "msg": "success", "data": {...}}

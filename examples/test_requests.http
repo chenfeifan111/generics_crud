@@ -1,0 +1,429 @@
+# HTTP 测试请求文件
+# 可以使用 VS Code 的 REST Client 插件或 IntelliJ IDEA 直接运行
+
+### 变量定义
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### ============ 基础 CRUD 操作 ============
+
+### 1. 创建用户
+POST {{baseUrl}}/users
+Content-Type: {{contentType}}
+
+{
+  "name": "张三",
+  "age": 25
+}
+
+### 2. 查询用户列表（带分页）
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "page": {
+    "page_num": 1,
+    "page_size": 10
+  },
+  "filters": {
+    "age": 18,
+    "name": "张"
+  },
+  "orders": {
+    "age": "desc",
+    "id": "asc"
+  }
+}
+
+### 3. 查询用户列表（不分页）
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": 18
+  },
+  "orders": {
+    "age": "desc"
+  }
+}
+
+### 4. 获取单个用户
+POST {{baseUrl}}/users/one
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "id": "替换为实际的用户ID"
+  }
+}
+
+### 5. 更新用户
+POST {{baseUrl}}/users/update
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "id": "替换为实际的用户ID"
+  },
+  "updates": {
+    "name": "李四",
+    "age": 30
+  }
+}
+
+### 6. 删除用户
+POST {{baseUrl}}/users/delete
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "id": "替换为实际的用户ID"
+  }
+}
+
+### ============ 批量操作 ============
+
+### 7. 批量创建用户
+POST {{baseUrl}}/users/batch
+Content-Type: {{contentType}}
+
+[
+  {"name": "用户1", "age": 20},
+  {"name": "用户2", "age": 25},
+  {"name": "用户3", "age": 30},
+  {"name": "用户4", "age": 35},
+  {"name": "用户5", "age": 40}
+]
+
+### 8. 批量更新用户（不同ID不同值）
+POST {{baseUrl}}/users/batch-update
+Content-Type: {{contentType}}
+
+[
+  {
+    "id": "替换为用户1的ID",
+    "updates": {"name": "更新后的名字1", "age": 26}
+  },
+  {
+    "id": "替换为用户2的ID",
+    "updates": {"name": "更新后的名字2", "age": 31}
+  }
+]
+
+### 9. 批量删除用户
+POST {{baseUrl}}/users/batch-delete
+Content-Type: {{contentType}}
+
+{
+  "ids": [
+    "替换为用户1的ID",
+    "替换为用户2的ID",
+    "替换为用户3的ID"
+  ]
+}
+
+### ============ 高级查询 ============
+
+### 10. 范围查询
+POST {{baseUrl}}/users/range
+Content-Type: {{contentType}}
+
+{
+  "page": {
+    "page_num": 1,
+    "page_size": 10
+  },
+  "filters": {
+    "age": {
+      "min": 18,
+      "max": 60
+    },
+    "name": "张"
+  },
+  "orders": {
+    "age": "asc"
+  }
+}
+
+### 11. 范围查询（只有最小值）
+POST {{baseUrl}}/users/range
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": {
+      "min": 18
+    }
+  }
+}
+
+### 12. 范围查询（只有最大值）
+POST {{baseUrl}}/users/range
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": {
+      "max": 60
+    }
+  }
+}
+
+### 13. OR 条件查询
+POST {{baseUrl}}/users/or
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "or": [
+      {"age": 18},
+      {"name": "admin"}
+    ]
+  },
+  "orders": {
+    "age": "desc"
+  }
+}
+
+### 14. 复杂 OR 条件查询（AND + OR）
+POST {{baseUrl}}/users/or
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "id": "特定的用户ID",
+    "or": [
+      {"age": 25},
+      {"name": "张三"}
+    ]
+  }
+}
+
+### ============ 统计查询 ============
+
+### 15. 基础统计
+POST {{baseUrl}}/users/stats
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": 18
+  }
+}
+
+### 16. 完整统计（使用通用 Handler）
+POST {{baseUrl}}/users-v3/stats
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": 18
+  },
+  "stats_config": {
+    "sum_fields": ["age"],
+    "avg_fields": ["age"],
+    "min_fields": ["age"],
+    "max_fields": ["age"]
+  }
+}
+
+### 17. 统计所有用户
+POST {{baseUrl}}/users/stats
+Content-Type: {{contentType}}
+
+{
+  "filters": {}
+}
+
+### ============ 使用通用 Handler 的 V3 版本 ============
+
+### 18. V3 查询
+POST {{baseUrl}}/users-v3/query
+Content-Type: {{contentType}}
+
+{
+  "page": {
+    "page_num": 1,
+    "page_size": 10
+  },
+  "filters": {
+    "age": 18
+  },
+  "orders": {
+    "age": "desc"
+  }
+}
+
+### 19. V3 创建
+POST {{baseUrl}}/users-v3
+Content-Type: {{contentType}}
+
+{
+  "name": "V3创建的用户",
+  "age": 28
+}
+
+### 20. V3 更新
+POST {{baseUrl}}/users-v3/update
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "id": "替换为实际的用户ID"
+  },
+  "updates": {
+    "name": "V3更新的名字",
+    "age": 35
+  }
+}
+
+### 21. V3 删除
+POST {{baseUrl}}/users-v3/delete
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "id": "替换为实际的用户ID"
+  }
+}
+
+### 22. V3 批量创建
+POST {{baseUrl}}/users-v3/batch
+Content-Type: {{contentType}}
+
+[
+  {"name": "V3批量用户1", "age": 22},
+  {"name": "V3批量用户2", "age": 27},
+  {"name": "V3批量用户3", "age": 32}
+]
+
+### ============ 分组查询示例 ============
+
+### 23. 按部门分组
+POST {{baseUrl}}/group-example/group
+Content-Type: {{contentType}}
+
+{
+  "group_by": ["department"],
+  "select": ["department", "COUNT(*) as count"]
+}
+
+### 24. 按部门和名字分组
+POST {{baseUrl}}/group-example/group
+Content-Type: {{contentType}}
+
+{
+  "group_by": ["department", "name"],
+  "select": ["department", "name", "COUNT(*) as count"]
+}
+
+### 25. 分组并过滤（HAVING）
+POST {{baseUrl}}/group-example/group
+Content-Type: {{contentType}}
+
+{
+  "group_by": ["department"],
+  "select": ["department", "COUNT(*) as count"],
+  "having": "COUNT(*) > 1"
+}
+
+### ============ 过滤操作符测试 ============
+
+### 26. 等于 (eq)
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": 25
+  }
+}
+
+### 27. 大于等于 (gte)
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "age": 18
+  }
+}
+
+### 28. 模糊查询 (like)
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "filters": {
+    "name": "张"
+  }
+}
+
+### ============ 排序测试 ============
+
+### 29. 单字段升序
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "orders": {
+    "age": "asc"
+  }
+}
+
+### 30. 单字段降序
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "orders": {
+    "age": "desc"
+  }
+}
+
+### 31. 多字段排序
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "orders": {
+    "age": "desc",
+    "id": "asc"
+  }
+}
+
+### ============ 分页测试 ============
+
+### 32. 第一页
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "page": {
+    "page_num": 1,
+    "page_size": 5
+  }
+}
+
+### 33. 第二页
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "page": {
+    "page_num": 2,
+    "page_size": 5
+  }
+}
+
+### 34. 大分页
+POST {{baseUrl}}/users/query
+Content-Type: {{contentType}}
+
+{
+  "page": {
+    "page_num": 1,
+    "page_size": 100
+  }
+}
