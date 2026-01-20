@@ -1,4 +1,4 @@
-# (go get github.com/chenfeifan111/generics_crud@latest
+# (go get github.com/chenfeifan111/generics_crud@main
 # 泛型数据库查询框架
 
 基于 Gin + Viper + GORM 的泛型数据库查询框架，支持动态过滤、排序和分页。
